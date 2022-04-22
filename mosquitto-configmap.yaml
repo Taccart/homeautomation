@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto
+data:
+  mosquitto.conf: |
+    allow_anonymous true
+    persistence false
+    per_listener_settings false
+    listener 1883
+

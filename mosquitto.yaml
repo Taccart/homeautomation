@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+
+  generation: 6
+  labels:
+    k8s-app: mosquitto
+  name: mosquitto
+
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: mosquitto
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        description: Mosquitto MQTT
+      creationTimestamp: null
+      labels:
+        k8s-app: mosquitto
+      name: mosquitto
+    spec:
+      containers:
+      - image: eclipse-mosquitto
+        imagePullPolicy: Always
+        name: mosquitto
+        resources:
+          requests:
+            memory: 64Mi
+        securityContext:
+          privileged: false
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /mosquitto/data
+          name: data
+        - mountPath: /mosquitto/logs
+          name: logs
+        - mountPath: /mosquitto/config
+          name: mosquitto-config
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: data
+      - emptyDir: {}
+        name: logs
+      - emptyDir: {}
+        name: confg
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: mosquitto.conf
+            path: mosquitto.conf
+          name: mosquitto
+        name: mosquitto-config

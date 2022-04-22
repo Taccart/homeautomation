@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: jeedom
+  name: jeedom
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: jeedom
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        description: https://doc.jeedom.com/fr_FR/installation/docker
+      creationTimestamp: null
+      labels:
+        k8s-app: jeedom
+      name: jeedom
+    spec:
+      containers:
+      - image: jeedom/jeedom:V4-stable
+        imagePullPolicy: IfNotPresent
+        name: jeedom
+        resources: {}
+        securityContext:
+          privileged: false
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www/html
+          name: www
+        - mountPath: /var/lib/mysql
+          name: mysql
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: www
+      - emptyDir: {}
+        name: mysql
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2022-04-22T04:22:44Z"
+    lastUpdateTime: "2022-04-22T04:22:44Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2022-04-22T04:17:27Z"
+    lastUpdateTime: "2022-04-22T04:22:44Z"
+    message: ReplicaSet "jeedom-699c99dcc8" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 2
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
